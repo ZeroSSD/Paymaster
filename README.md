@@ -3,12 +3,12 @@
 
 # Table of Contents
 
-* [Problem Statement](#ps)
+* [Problem Statement](#problem-statement)
 * [Acceptance Criteria](#acceptance-criteria)
 * [Tools Used](#tools-used)
 * [System Architecture](#system-architecture)
 * [Assumptions](#assumptions)
-* [Implementation Details](#implementation)
+* [Implementation Details](#implementation-details)
 
 
 ## Problem Statement
