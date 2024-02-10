@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Paymaster {
+import {HTLC} from "AtomicSwap.sol";
+
+contract Paymaster is HTLC {
     /**
      * Variable Declaration
      */
@@ -127,5 +129,14 @@ contract Paymaster {
 
     function getOwner() public view returns (address) {
         return owner;
+    }
+
+    function Htlc() public isAccountActive() {
+        require(
+            balances[msg.sender] >= amount,
+            "Htlc(): Not enough balance"
+        );
+        balances[msg.sender]-=amount;
+        balances[msg.sender]+=token;
     }
 }
