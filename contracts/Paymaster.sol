@@ -182,14 +182,6 @@ contract Paymaster is HTLC {
     }
 
     /**
-     * @dev Gets the owner of the contract
-     * @return The address of the owner of the contract
-     */
-    function getOwner() public view returns (address) {
-        return owner;
-    }
-
-    /**
      * @dev Performs an HTLC transaction
      */
     function Htlc() public isAccountActive() {
