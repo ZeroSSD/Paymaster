@@ -72,13 +72,22 @@ interface IERC20 {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
 
+/**
+ * @title Token contract - ERC20 token implementation
+ * @dev A contract representing an ERC20 token with a simplified constructor.
+ */
 contract Token is ERC20 {
-  constructor(
-    string memory name, 
-    string memory ticker
-  ) 
-    ERC20(name, ticker) 
-  {
-    _mint(msg.sender, 1);
-  }
+    /**
+     * @dev Constructor to initialize the ERC20 token
+     * @param name The name of the token
+     * @param ticker The ticker symbol of the token
+     */
+    constructor(
+        string memory name, 
+        string memory ticker
+    ) 
+        ERC20(name, ticker) 
+    {
+        _mint(msg.sender, 1);
+    }
 }

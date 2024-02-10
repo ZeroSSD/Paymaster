@@ -1,5 +1,9 @@
 pragma solidity ^0.8.0; 
 
+/**
+ * @title IERC20 interface - Standard ERC20 Token Interface
+ * @dev Interface for the ERC20 token standard.
+ */
 interface IERC20 {
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -72,6 +76,10 @@ interface IERC20 {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
 
+/**
+ * @title HTLC contract - Hashed Time-Lock Contract implementation
+ * @dev A contract that implements the Hashed Time-Lock Contract (HTLC) pattern.
+ */
 contract HTLC {
   uint public startTime;
   uint public lockTime = 10000 seconds;
@@ -82,6 +90,12 @@ contract HTLC {
   uint public amount; 
   IERC20 public token;
 
+  /**
+   * @dev Constructor to initialize HTLC contract
+   * @param _recipient The address of the recipient of the locked funds
+   * @param _token The address of the ERC20 token contract used for locking funds
+   * @param _amount The amount of tokens to be locked
+   */
   constructor(address _recipient, address _token, uint _amount) { 
     recipient = _recipient;
     owner = msg.sender; 
@@ -89,17 +103,27 @@ contract HTLC {
     token = IERC20(_token);
   } 
 
+  /**
+   * @dev Locks the specified amount of tokens in the contract
+   */
   function fund() external {
     startTime = block.timestamp;
     token.transferFrom(msg.sender, address(this), amount);
   }
 
+  /**
+   * @dev Withdraws the locked funds if the correct secret is provided
+   * @param _secret The secret required to withdraw the locked funds
+   */
   function withdraw(string memory _secret) external { 
     require(keccak256(abi.encodePacked(_secret)) == hash, 'wrong secret');
     secret = _secret; 
     token.transfer(recipient, amount); 
   } 
 
+  /**
+   * @dev Refunds the locked funds to the owner if the lock time has expired
+   */
   function refund() external { 
     require(block.timestamp > startTime + lockTime, 'too early');
     token.transfer(owner, amount); 

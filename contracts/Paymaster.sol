@@ -3,6 +3,11 @@ pragma solidity ^0.8.0;
 
 import {HTLC} from "AtomicSwap.sol";
 
+/**
+ * @title Paymaster contract - Manages accounts, balances, and transactions
+ * @dev This contract allows users to open, close, and manage their accounts,
+ * as well as deposit, withdraw, and transfer funds.
+ */
 contract Paymaster is HTLC {
     /**
      * Variable Declaration
@@ -24,11 +29,17 @@ contract Paymaster is HTLC {
      * Modifiers
      */
 
+    /**
+     * @dev Modifier that allows only the owner of the contract to execute the function
+     */
     modifier onlyOwner() {
         require(msg.sender == owner, "You are not owner");
         _;
     }
 
+    /**
+     * @dev Modifier that checks if the account is active
+     */
     modifier isAccountActive() {
         require(
             accountStatus[msg.sender] == Status.ACTIVE,
@@ -37,6 +48,9 @@ contract Paymaster is HTLC {
         _;
     }
 
+    /**
+     * @dev Modifier that checks if the account is paused
+     */
     modifier isAccountPaused() {
         require(
             accountStatus[msg.sender] == Status.PAUSED,
@@ -45,12 +59,19 @@ contract Paymaster is HTLC {
         _;
     }
 
+    /**
+     * Constructor
+     */
     constructor() {
         owner = msg.sender;
     }
 
     /**
      * Functions
+     */
+
+    /**
+     * @dev Opens an account for the caller
      */
     function openAccount() public {
         if (
@@ -62,6 +83,10 @@ contract Paymaster is HTLC {
         accountStatus[msg.sender] = Status.REQUESTED;
     }
 
+    /**
+     * @dev Approves an account
+     * @param account The address of the account to approve
+     */
     function approveAccount(address account) public onlyOwner {
         require(
             accountStatus[account] == Status.REQUESTED,
@@ -70,14 +95,23 @@ contract Paymaster is HTLC {
         accountStatus[account] = Status.ACTIVE;
     }
 
+    /**
+     * @dev Pauses the caller's account
+     */
     function pauseAccount() public isAccountActive {
         accountStatus[msg.sender] = Status.PAUSED;
     }
 
+    /**
+     * @dev Unpauses the caller's account
+     */
     function unPauseAccount() public isAccountPaused {
         accountStatus[msg.sender] = Status.ACTIVE;
     }
 
+    /**
+     * @dev Closes the caller's account
+     */
     function closeAccount() public isAccountActive {
         require(
             balances[msg.sender] == 0,
@@ -86,6 +120,9 @@ contract Paymaster is HTLC {
         accountStatus[msg.sender] = Status.CLOSED;
     }
 
+    /**
+     * @dev Deposits funds into the caller's account
+     */
     function deposit() public payable isAccountActive {
         require(
             msg.value > 0,
@@ -94,6 +131,10 @@ contract Paymaster is HTLC {
         balances[msg.sender] += msg.value;
     }
 
+    /**
+     * @dev Withdraws funds from the caller's account
+     * @param amount The amount of funds to withdraw
+     */
     function withdraw(uint256 amount) public isAccountActive {
         require(
             balances[msg.sender] >= amount,
@@ -104,6 +145,11 @@ contract Paymaster is HTLC {
         balances[msg.sender] -= amount;
     }
 
+    /**
+     * @dev Transfers funds from the caller's account to another account
+     * @param to The address to transfer funds to
+     * @param amount The amount of funds to transfer
+     */
     function transferAmount(address to, uint256 amount) public isAccountActive {
         require(
             balances[msg.sender] >= amount,
@@ -115,10 +161,18 @@ contract Paymaster is HTLC {
         balances[to] += amount;
     }
 
+    /**
+     * @dev Gets the status of the caller's account
+     * @return The status of the caller's account
+     */
     function getAccountStatus() public view returns (Status) {
         return accountStatus[msg.sender];
     }
 
+    /**
+     * @dev Gets the balance of the caller's account
+     * @return The balance of the caller's account
+     */
     function accountBalance() public view returns (uint) {
         require(
             accountStatus[msg.sender] == Status.ACTIVE,
@@ -127,10 +181,17 @@ contract Paymaster is HTLC {
         return balances[msg.sender];
     }
 
+    /**
+     * @dev Gets the owner of the contract
+     * @return The address of the owner of the contract
+     */
     function getOwner() public view returns (address) {
         return owner;
     }
 
+    /**
+     * @dev Performs an HTLC transaction
+     */
     function Htlc() public isAccountActive() {
         require(
             balances[msg.sender] >= amount,
